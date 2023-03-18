@@ -12,17 +12,23 @@ video_put_args.add_argument("likes", type=int, help="Likes of the video is requi
 videos = {}
 
 
-def abort_if_video_id_doesnt_exist(video_id):
+def abort_when_video_id_doesnt_exist(video_id):
     if video_id not in videos:
         abort(404, message="Video is not found.")
 
 
+def abort_when_video_exists(video_id):
+    if video_id in videos:
+        abort(409, message="Video with such Id already exists.")
+
+
 class Video(Resource):
     def get(self, video_id):
-        abort_if_video_id_doesnt_exist(video_id)
+        abort_when_video_id_doesnt_exist(video_id)
         return videos[video_id]
 
     def post(self, video_id):
+        abort_when_video_exists(video_id)
         args = video_put_args.parse_args()
         videos[video_id] = args
         return videos[video_id], 201
